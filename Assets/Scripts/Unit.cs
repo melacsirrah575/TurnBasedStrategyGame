@@ -5,10 +5,10 @@ using Movement;
 
 public class Unit : MonoBehaviour
 {
+    [SerializeField] Animator unitAnimator;
     [SerializeField] private float moveSpeed = 4f;
+
     private Vector3 targetPosition;
-
-
 
     private void Move(Vector3 targetPosition)
     {
@@ -23,6 +23,7 @@ public class Unit : MonoBehaviour
         if (distance > 0)
         {
             Vector3 move = toTarget.normalized * moveSpeed * Time.deltaTime;
+            unitAnimator.SetBool("IsWalking", true);
 
             //If we are going to overshoot
             if (move.magnitude > distance)
@@ -31,6 +32,10 @@ public class Unit : MonoBehaviour
                 move = toTarget;
             }
             transform.position += move;
+        }
+        else
+        {
+            unitAnimator.SetBool("IsWalking", false);
         }
 
 
