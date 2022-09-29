@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Movement
+namespace ActionSystem
 {
     public class MouseWorld : MonoBehaviour
     {
