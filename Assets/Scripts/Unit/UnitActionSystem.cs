@@ -15,15 +15,6 @@ namespace ActionSystem
         [SerializeField] private Unit selectedUnit;
         [SerializeField] private LayerMask unitLayerMask;
 
-        #region Public Methods
-        public Unit GetSelectedUnit()
-        {
-            return selectedUnit;
-        }
-
-        #endregion
-
-        #region Private Methods
         //Turning this script into a Singleton
         private void Awake()
         {
@@ -75,6 +66,9 @@ namespace ActionSystem
             //}
         }
 
-        #endregion
+        public Unit GetSelectedUnit()
+        {
+            return selectedUnit;
+        }
     }
 }
