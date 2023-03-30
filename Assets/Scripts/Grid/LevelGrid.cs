@@ -51,7 +51,17 @@ public class LevelGrid : MonoBehaviour
         AddUnitAtGridPosition(toGridPosition, unit);
     }
 
+        public bool HasAnyUnitOnGridPosition(GridPosition gridPosition) 
+    {
+        GridObject gridObject = gridSystem.GetGridObject(gridPosition);
+
+        return gridObject.HasAnyUnit();
+    }
+
     //This is no different than writing a return function
     //Often used when just wanting to pass something through a system
     public GridPosition GetGridPosition(Vector3 worldPostion) => gridSystem.GetGridPosition(worldPostion);
+    public Vector3 GetWorldPosition(GridPosition gridPostion) => gridSystem.GetWorldPosition(gridPostion);
+
+    public bool IsValidGridPosition(GridPosition gridPosition) => gridSystem.IsValidGridPosition(gridPosition);
 }
