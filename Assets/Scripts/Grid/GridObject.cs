@@ -2,45 +2,51 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GridObject
+using Units;
+
+namespace GridNamespace
 {
-    private GridSystem gridSystem;
-    private GridPosition gridPosition;
-    private List<Unit> unitList;
-
-    public GridObject(GridSystem gridSystem, GridPosition gridPosition)
+    public class GridObject
     {
-        this.gridSystem = gridSystem;
-        this.gridPosition = gridPosition;
-        unitList = new List<Unit>();
-    }
+        private GridSystem gridSystem;
+        private GridPosition gridPosition;
+        private List<Unit> unitList;
 
-    public override string ToString()
-    {
-        string unitString = "";
-        foreach (Unit unit in unitList)
+        public GridObject(GridSystem gridSystem, GridPosition gridPosition)
         {
-            unitString += unit + "\n";
+            this.gridSystem = gridSystem;
+            this.gridPosition = gridPosition;
+            unitList = new List<Unit>();
         }
-        return gridPosition.ToString() + "\n" + unitString;
-    }
 
-    public void AddUnit(Unit unit)
-    {
-        unitList.Add(unit);
-    }
+        public override string ToString()
+        {
+            string unitString = "";
+            foreach (Unit unit in unitList)
+            {
+                unitString += unit + "\n";
+            }
+            return gridPosition.ToString() + "\n" + unitString;
+        }
 
-    public void RemoveUnit (Unit unit)
-    {
-        unitList.Remove(unit);
-    }
+        public void AddUnit(Unit unit)
+        {
+            unitList.Add(unit);
+        }
 
-    public List<Unit> GetUnitList()
-    {
-        return unitList;
-    }
+        public void RemoveUnit(Unit unit)
+        {
+            unitList.Remove(unit);
+        }
 
-    public bool HasAnyUnit() {
-        return unitList.Count > 0;
+        public List<Unit> GetUnitList()
+        {
+            return unitList;
+        }
+
+        public bool HasAnyUnit()
+        {
+            return unitList.Count > 0;
+        }
     }
 }
