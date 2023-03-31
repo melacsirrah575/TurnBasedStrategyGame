@@ -2,7 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoveAction : MonoBehaviour
+using GridNamespace;
+using Units;
+
+namespace Actions {
+    public class MoveAction : MonoBehaviour
 {
     [SerializeField] Animator unitAnimator;
     [SerializeField] private float moveSpeed = 4f;
@@ -84,4 +88,5 @@ public class MoveAction : MonoBehaviour
 
         return validGridPositionList;
     }
+}
 }

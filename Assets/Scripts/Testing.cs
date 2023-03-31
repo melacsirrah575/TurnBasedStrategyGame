@@ -1,8 +1,8 @@
-using ActionSystem;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using Units;
 public class Testing : MonoBehaviour
 {
     [SerializeField] private Unit unit;
@@ -15,7 +15,7 @@ public class Testing : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.T))
         {
-            unit.GetMoveAction().GetValidActionGridPositionList();
+
         }
     }
 }

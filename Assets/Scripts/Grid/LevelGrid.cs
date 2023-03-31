@@ -2,66 +2,73 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using Units;
+
 //THIS SCRIPT IS A SINGLETON
-public class LevelGrid : MonoBehaviour
+namespace GridNamespace
 {
-    public static LevelGrid Instance { get; private set; }
-
-    [SerializeField] private Transform gridDebugObjectPrefab;
-    private GridSystem gridSystem;
-
-    private void Awake()
+    public class LevelGrid : MonoBehaviour
     {
-        if (Instance != null)
+        public static LevelGrid Instance { get; private set; }
+
+        [SerializeField] private Transform gridDebugObjectPrefab;
+        private GridSystem gridSystem;
+
+        private void Awake()
         {
-            Debug.LogError($"There is more than one LevelGrid {transform} - {Instance}");
-            Destroy(gameObject);
-            return;
+            if (Instance != null)
+            {
+                Debug.LogError($"There is more than one LevelGrid {transform} - {Instance}");
+                Destroy(gameObject);
+                return;
+            }
+
+            Instance = this;
+
+            gridSystem = new GridSystem(10, 10, 2f);
+            gridSystem.CreateDebugObjects(gridDebugObjectPrefab);
         }
 
-        Instance = this;
+        //Gets GridObject from system and sets a unit at a specific position
+        //GridObject stores the unit that is passed through
+        public void AddUnitAtGridPosition(GridPosition position, Unit unit)
+        {
+            GridObject gridObject = gridSystem.GetGridObject(position);
+            gridObject.AddUnit(unit);
+        }
 
-        gridSystem = new GridSystem(10, 10, 2f);
-        gridSystem.CreateDebugObjects(gridDebugObjectPrefab);
+        public List<Unit> GetUnitListAtGridPosition(GridPosition position)
+        {
+            GridObject gridObject = gridSystem.GetGridObject(position);
+            return gridObject.GetUnitList();
+        }
+
+        public void RemoveUnitAtGridPosition(GridPosition position, Unit unit)
+        {
+            GridObject gridObject = gridSystem.GetGridObject(position);
+            gridObject.RemoveUnit(unit);
+        }
+
+        public void UnitMovedGridPosition(Unit unit, GridPosition fromGridPosition, GridPosition toGridPosition)
+        {
+            RemoveUnitAtGridPosition(fromGridPosition, unit);
+            AddUnitAtGridPosition(toGridPosition, unit);
+        }
+
+        public bool HasAnyUnitOnGridPosition(GridPosition gridPosition)
+        {
+            GridObject gridObject = gridSystem.GetGridObject(gridPosition);
+
+            return gridObject.HasAnyUnit();
+        }
+
+        //This is no different than writing a return function
+        //Often used when just wanting to pass something through a system
+        public GridPosition GetGridPosition(Vector3 worldPostion) => gridSystem.GetGridPosition(worldPostion);
+        public Vector3 GetWorldPosition(GridPosition gridPostion) => gridSystem.GetWorldPosition(gridPostion);
+        public int GetWidth() => gridSystem.GetWidth();
+        public int GetHeight() => gridSystem.GetHeight();
+        public bool IsValidGridPosition(GridPosition gridPosition) => gridSystem.IsValidGridPosition(gridPosition);
+
     }
-
-    //Gets GridObject from system and sets a unit at a specific position
-    //GridObject stores the unit that is passed through
-    public void AddUnitAtGridPosition(GridPosition position, Unit unit)
-    {
-        GridObject gridObject = gridSystem.GetGridObject(position);
-        gridObject.AddUnit(unit);
-    }
-
-    public List<Unit> GetUnitListAtGridPosition(GridPosition position)
-    {
-        GridObject gridObject = gridSystem.GetGridObject(position);
-        return gridObject.GetUnitList();
-    }
-
-    public void RemoveUnitAtGridPosition(GridPosition position, Unit unit)
-    {
-        GridObject gridObject = gridSystem.GetGridObject(position);
-        gridObject.RemoveUnit(unit);
-    }
-
-    public void UnitMovedGridPosition(Unit unit, GridPosition fromGridPosition, GridPosition toGridPosition)
-    {
-        RemoveUnitAtGridPosition(fromGridPosition, unit);
-        AddUnitAtGridPosition(toGridPosition, unit);
-    }
-
-        public bool HasAnyUnitOnGridPosition(GridPosition gridPosition) 
-    {
-        GridObject gridObject = gridSystem.GetGridObject(gridPosition);
-
-        return gridObject.HasAnyUnit();
-    }
-
-    //This is no different than writing a return function
-    //Often used when just wanting to pass something through a system
-    public GridPosition GetGridPosition(Vector3 worldPostion) => gridSystem.GetGridPosition(worldPostion);
-    public Vector3 GetWorldPosition(GridPosition gridPostion) => gridSystem.GetWorldPosition(gridPostion);
-
-    public bool IsValidGridPosition(GridPosition gridPosition) => gridSystem.IsValidGridPosition(gridPosition);
 }

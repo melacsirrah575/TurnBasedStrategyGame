@@ -1,10 +1,10 @@
-using ActionSystem;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UnitSelectedVisual : MonoBehaviour
+namespace Units {
+    public class UnitSelectedVisual : MonoBehaviour
 {
     [SerializeField] private Unit unit;
 
@@ -38,4 +38,5 @@ public class UnitSelectedVisual : MonoBehaviour
             meshRenderer.enabled = false;
         }
     }
+}
 }

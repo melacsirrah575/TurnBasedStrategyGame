@@ -3,7 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ActionSystem
+using Utility;
+using GridNamespace;
+
+namespace Units
 {
     //THIS SCRIPT IS A SINGLETON
     public class UnitActionSystem : MonoBehaviour
