@@ -6,7 +6,7 @@ using GridNamespace;
 using Units;
 
 namespace Actions {
-    public class MoveAction : MonoBehaviour
+    public class MoveAction : BaseAction
 {
     [SerializeField] Animator unitAnimator;
     [SerializeField] private float moveSpeed = 4f;
@@ -15,46 +15,39 @@ namespace Actions {
 
 
     private Vector3 targetPosition;
-    private Unit unit;
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         targetPosition = transform.position;
-        unit = GetComponent<Unit>();
     }
 
     void Update()
     {
-        Vector3 toTarget = targetPosition - transform.position;
-        float distance = toTarget.magnitude;
+        if (!isActive) return;
 
-        if (distance > 0)
+        float stoppingDistance = 0.1f;
+        Vector3 moveDirection = (targetPosition - transform.position).normalized;
+
+        if (Vector3.Distance(transform.position, targetPosition) > stoppingDistance)
         {
-            Vector3 move = toTarget.normalized * moveSpeed * Time.deltaTime;
-
-            //This rotate is not a linear rotation because our transform.forward is constantly being updated.
-            //To make it linear, one would need to store starting forward value and only have time change
-            transform.forward = Vector3.Lerp(transform.forward, toTarget, Time.deltaTime * rotateSpeed);
+            transform.position += moveDirection * moveSpeed * Time.deltaTime;
 
             unitAnimator.SetBool("IsWalking", true);
-
-            //If we are going to overshoot
-            if (move.magnitude > distance)
-            {
-                //Move to target's exact location
-                move = toTarget;
-            }
-            transform.position += move;
         }
         else
         {
             unitAnimator.SetBool("IsWalking", false);
+            isActive = false;
         }
+
+        transform.forward = Vector3.Lerp(transform.forward, moveDirection, Time.deltaTime * rotateSpeed);
     }
 
     public void Move(GridPosition gridPosition)
     {
         this.targetPosition = LevelGrid.Instance.GetWorldPosition(gridPosition);
+        isActive = true;
     }
 
     public bool IsValidActionGridPosition(GridPosition gridPosition) {
