@@ -5,6 +5,7 @@ using UnityEngine;
 
 using Utility;
 using GridNamespace;
+using Actions;
 
 namespace Units
 {
@@ -18,6 +19,7 @@ namespace Units
         [SerializeField] private Unit selectedUnit;
         [SerializeField] private LayerMask unitLayerMask;
 
+        private BaseAction selectedAction;
         private bool isBusy;
 
         //Turning this script into a Singleton
@@ -33,29 +35,42 @@ namespace Units
             Instance = this;
         }
 
+        private void Start()
+        {
+            SetSelectedUnit(selectedUnit);
+        }
+
         private void Update()
         {
             if (isBusy) return;
+            if (TryHandleUnitSelection()) return;
 
+            HandleSelectedAction();
+        }
+
+        private void HandleSelectedAction()
+        {
             if (Input.GetMouseButtonDown(0))
             {
-                if (TryHandleUnitSelection()) return;
-
                 GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPosition(MouseWorld.GetPosition());
 
-                if (selectedUnit.GetMoveAction().IsValidActionGridPosition(mouseGridPosition))
+                switch (selectedAction)
                 {
-                    SetBusy();
-                    selectedUnit.GetMoveAction().Move(mouseGridPosition, ClearBusy);
+                    case MoveAction moveAction:
+
+                        if (moveAction.IsValidActionGridPosition(mouseGridPosition))
+                        {
+                            SetBusy();
+                            moveAction.Move(mouseGridPosition, ClearBusy);
+                        }
+                        break;
+                    case SpinAction spinAction:
+
+                        SetBusy();
+                        //Calling CleaBusy by way of a delegate in SpinAction script
+                        spinAction.Spin(ClearBusy);
+                        break;
                 }
-            }
-
-            if (Input.GetMouseButtonDown(1))
-            {
-                SetBusy();
-
-                //Calling CleaBusy by way of a delegate in SpinAction script
-                selectedUnit.GetSpinAction().Spin(ClearBusy);
             }
         }
 
@@ -71,22 +86,28 @@ namespace Units
 
         private bool TryHandleUnitSelection()
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit, float.MaxValue, unitLayerMask))
+            if (Input.GetMouseButtonDown(0))
             {
-                if (hit.transform.TryGetComponent<Unit>(out Unit selectedUnit))
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out RaycastHit hit, float.MaxValue, unitLayerMask))
                 {
-                    SetSelectedUnit(selectedUnit);
-                    return true;
+                    if (hit.transform.TryGetComponent<Unit>(out Unit selectedUnit))
+                    {
+                        SetSelectedUnit(selectedUnit);
+                        return true;
+                    }
                 }
             }
-
             return false;
+
         }
 
         private void SetSelectedUnit(Unit unit)
         {
             selectedUnit = unit;
+
+            //Defaulting the initial selected action to the Move action
+            SetSelectedAction(unit.GetMoveAction());
             OnSelectedUnitChanged?.Invoke(this, EventArgs.Empty);
 
             //COMMENTED CODE BELOW EXPLAINS WHAT ABOVE ONSELECTUNITCHANGED IS DOING
@@ -100,6 +121,11 @@ namespace Units
         public Unit GetSelectedUnit()
         {
             return selectedUnit;
+        }
+
+        public void SetSelectedAction(BaseAction baseAction)
+        {
+            selectedAction = baseAction;
         }
     }
 }

@@ -6,9 +6,9 @@ using UnityEngine;
 namespace Actions
 {
     public class SpinAction : BaseAction
-    {        
+    {
         private float totalSpinAmount;
-        
+
         private void Update()
         {
             if (!isActive) return;
@@ -32,6 +32,11 @@ namespace Actions
             isActive = true;
             totalSpinAmount = 0;
             Debug.Log("Spin Action Called");
+        }
+
+        public override string GetActionName()
+        {
+            return "Spin";
         }
     }
 }
