@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 using Utility;
 using GridNamespace;
@@ -15,6 +16,7 @@ namespace Units
         public static UnitActionSystem Instance { get; private set; }
 
         public event EventHandler OnSelectedUnitChanged;
+        public event EventHandler OnSelectedActionChanged;
 
         [SerializeField] private Unit selectedUnit;
         [SerializeField] private LayerMask unitLayerMask;
@@ -43,6 +45,7 @@ namespace Units
         private void Update()
         {
             if (isBusy) return;
+            if (EventSystem.current.IsPointerOverGameObject()) return;
             if (TryHandleUnitSelection()) return;
 
             HandleSelectedAction();
@@ -54,22 +57,11 @@ namespace Units
             {
                 GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPosition(MouseWorld.GetPosition());
 
-                switch (selectedAction)
+                if (selectedAction.IsValidActionGridPosition(mouseGridPosition))
                 {
-                    case MoveAction moveAction:
+                    SetBusy();
+                    selectedAction.TakeAction(mouseGridPosition, ClearBusy);
 
-                        if (moveAction.IsValidActionGridPosition(mouseGridPosition))
-                        {
-                            SetBusy();
-                            moveAction.Move(mouseGridPosition, ClearBusy);
-                        }
-                        break;
-                    case SpinAction spinAction:
-
-                        SetBusy();
-                        //Calling CleaBusy by way of a delegate in SpinAction script
-                        spinAction.Spin(ClearBusy);
-                        break;
                 }
             }
         }
@@ -91,9 +83,15 @@ namespace Units
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(ray, out RaycastHit hit, float.MaxValue, unitLayerMask))
                 {
-                    if (hit.transform.TryGetComponent<Unit>(out Unit selectedUnit))
+                    if (hit.transform.TryGetComponent<Unit>(out Unit unit))
                     {
-                        SetSelectedUnit(selectedUnit);
+                        if (unit == selectedUnit)
+                        {
+                            //Unitis already selected
+                            return false;
+                        }
+
+                        SetSelectedUnit(unit);
                         return true;
                     }
                 }
@@ -126,6 +124,13 @@ namespace Units
         public void SetSelectedAction(BaseAction baseAction)
         {
             selectedAction = baseAction;
+
+            OnSelectedActionChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        public BaseAction GetSelectedAction()
+        {
+            return selectedAction;
         }
     }
 }
