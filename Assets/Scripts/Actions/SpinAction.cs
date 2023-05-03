@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,9 +6,9 @@ using UnityEngine;
 namespace Actions
 {
     public class SpinAction : BaseAction
-    {
+    {        
         private float totalSpinAmount;
-
+        
         private void Update()
         {
             if (!isActive) return;
@@ -19,12 +20,15 @@ namespace Actions
             if (totalSpinAmount >= 360)
             {
                 isActive = false;
+                //This is where the delegate will callback the function we are passing
+                onActionComplete();
             }
 
         }
 
-        public void Spin()
+        public void Spin(Action onActionComplete)
         {
+            this.onActionComplete = onActionComplete;
             isActive = true;
             totalSpinAmount = 0;
             Debug.Log("Spin Action Called");

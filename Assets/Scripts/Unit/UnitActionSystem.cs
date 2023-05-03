@@ -18,6 +18,8 @@ namespace Units
         [SerializeField] private Unit selectedUnit;
         [SerializeField] private LayerMask unitLayerMask;
 
+        private bool isBusy;
+
         //Turning this script into a Singleton
         private void Awake()
         {
@@ -33,21 +35,38 @@ namespace Units
 
         private void Update()
         {
+            if (isBusy) return;
+
             if (Input.GetMouseButtonDown(0))
             {
                 if (TryHandleUnitSelection()) return;
 
                 GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPosition(MouseWorld.GetPosition());
 
-                if (selectedUnit.GetMoveAction().IsValidActionGridPosition(mouseGridPosition)) 
+                if (selectedUnit.GetMoveAction().IsValidActionGridPosition(mouseGridPosition))
                 {
-                    selectedUnit.GetMoveAction().Move(mouseGridPosition);
+                    SetBusy();
+                    selectedUnit.GetMoveAction().Move(mouseGridPosition, ClearBusy);
                 }
             }
 
-            if (Input.GetMouseButtonDown(1)) {
-                selectedUnit.GetSpinAction().Spin();
+            if (Input.GetMouseButtonDown(1))
+            {
+                SetBusy();
+
+                //Calling CleaBusy by way of a delegate in SpinAction script
+                selectedUnit.GetSpinAction().Spin(ClearBusy);
             }
+        }
+
+        private void SetBusy()
+        {
+            isBusy = true;
+        }
+
+        private void ClearBusy()
+        {
+            isBusy = false;
         }
 
         private bool TryHandleUnitSelection()
